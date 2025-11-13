@@ -2,23 +2,38 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { auth } from "@/lib/firebase"; // ✅ uses your correct firebase setup
 
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, email, password);
-      router.push("/auth/signin");
+      // Create user
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Send verification email
+      await sendEmailVerification(user);
+
+      alert("📧 Verification email sent! Please check your inbox or spam folder.");
+
+      // Optional: redirect after 2s to sign-in page
+      setTimeout(() => router.push("/auth/signin"), 2000);
     } catch (err: any) {
-      setError(err.message);
+      console.error("Signup error:", err);
+      setError(err.message || "Failed to sign up");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,9 +67,10 @@ export default function SignupPage() {
 
         <button
           type="submit"
+          disabled={loading}
           className="bg-gradient-to-r from-green-400 to-emerald-500 text-white p-2 rounded hover:opacity-90 transition-opacity"
         >
-          Create Account
+          {loading ? "Creating Account..." : "Create Account"}
         </button>
 
         <p className="text-sm text-center mt-2">

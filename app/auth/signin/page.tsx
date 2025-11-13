@@ -4,96 +4,87 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { Mail, Lock, LogIn } from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function SigninPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const handleSignin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      if (!userCredential.user.emailVerified) {
-        alert("Please verify your email before signing in.");
+      const user = userCredential.user;
+
+      if (!user.emailVerified) {
+        alert("⚠️ Please verify your email before signing in.");
         return;
       }
-      router.push("/");
+
+      router.push("/"); // redirect to homepage or dashboard
     } catch (err: any) {
+      console.error("Signin error:", err);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-950 text-white overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#232526] to-[#414345] text-white">
+      <form
+        onSubmit={handleSignin}
+        className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-80 flex flex-col gap-4"
       >
-        <form
-          onSubmit={handleSignin}
-          className="bg-gray-800/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-[380px] border border-gray-700"
+        <h2 className="text-2xl font-bold text-center mb-4">Sign In</h2>
+
+        {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+        <input
+          type="email"
+          placeholder="Email"
+          className="p-2 rounded bg-white/20 text-white outline-none"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="p-2 rounded bg-white/20 text-white outline-none"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white p-2 rounded hover:opacity-90 transition-opacity"
         >
-          <motion.h2
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-3xl font-bold mb-6 text-center text-blue-400"
-          >
-            Welcome Back
-          </motion.h2>
+          {loading ? "Signing In..." : "Sign In"}
+        </button>
 
-          <div className="flex items-center gap-2 mb-4 border border-gray-600 rounded-lg px-3 py-2 focus-within:border-blue-500 transition-colors">
-            <Mail className="w-5 h-5 text-gray-400 flex-shrink-0" />
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full bg-transparent outline-none text-white placeholder-gray-400"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        <a
+          href="/auth/reset"
+          className="text-cyan-400 text-sm text-center hover:underline mt-2"
+        >
+          Forgot password?
+        </a>
 
-          <div className="flex items-center gap-2 mb-4 border border-gray-600 rounded-lg px-3 py-2 focus-within:border-blue-500 transition-colors">
-            <Lock className="w-5 h-5 text-gray-400 flex-shrink-0" />
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full bg-transparent outline-none text-white placeholder-gray-400"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          {error && <p className="text-red-400 text-sm mb-2">{error}</p>}
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 py-2.5 rounded-lg font-medium transition-all duration-200"
-          >
-            <LogIn className="w-5 h-5 text-white flex-shrink-0" />
-            Sign In
-          </motion.button>
-
-          <p className="text-gray-400 text-sm text-center mt-4">
-            Don’t have an account?{" "}
-            <span
-              onClick={() => router.push("/auth/signup")}
-              className="text-blue-400 hover:underline cursor-pointer"
-            >
-              Sign up
-            </span>
-          </p>
-        </form>
-      </motion.div>
-    </div>
+        <p className="text-sm text-center mt-2">
+          Don’t have an account?{" "}
+          <a href="/auth/signup" className="text-green-400 hover:underline">
+            Sign Up
+          </a>
+        </p>
+      </form>
+    </main>
   );
 }
