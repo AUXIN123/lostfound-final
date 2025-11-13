@@ -1,0 +1,48 @@
+import { getFirestore, collection, addDoc, Timestamp } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getAuth } from "firebase/auth";
+
+// Upload image to Firebase Storage
+export const uploadImage = async (file: File) => {
+  const storage = getStorage(); // Initialize storage directly
+  try {
+    const storageRef = ref(storage, `lostItems/${Date.now()}-${file.name}`);
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  } catch (error) {
+    console.error("❌ Error uploading image:", error);
+    throw error;
+  }
+};
+
+// Add lost item to Firestore (with userId)
+export const addLostItem = async (itemData: any, imageFile?: File) => {
+  const db = getFirestore(); // Initialize firestore directly
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      throw new Error("You must be logged in to report a lost item");
+    }
+
+    let imageUrl = null;
+    if (imageFile) {
+      imageUrl = await uploadImage(imageFile);
+    }
+
+    const docRef = await addDoc(collection(db, "items"), {
+      ...itemData,
+      image: imageUrl,
+      userId: user.uid, // ✅ include user ID
+      createdAt: Timestamp.now(),
+    });
+
+    console.log("✅ Added new item with ID:", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("❌ Error adding item:", error);
+    throw error;
+  }
+};

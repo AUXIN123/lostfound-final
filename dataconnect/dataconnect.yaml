@@ -1,0 +1,19 @@
+specVersion: "v1"
+serviceId: "lostfound2"
+location: "asia-south1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "fdcdb"
+      cloudSql:
+        instanceId: "lostfound2-fdc"
+        # schemaValidation: "STRICT"     # STRICT mode makes Postgres schema match Data Connect exactly.
+        # schemaValidation: "COMPATIBLE" # COMPATIBLE mode makes Postgres schema compatible with Data Connect.
+connectorDirs: []
+service:
+  name: lostandfound-service
+  connector:
+    type: firestore
+    location: asia-south1
+    database: "(default)"

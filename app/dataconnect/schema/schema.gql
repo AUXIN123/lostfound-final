@@ -1,0 +1,45 @@
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  photoURL: String
+  verified: Boolean!
+  reputation: Int!
+  createdAt: DateTime!
+}
+
+type Post {
+  id: ID!
+  userId: ID!
+  type: String! # "lost" or "found"
+  title: String!
+  description: String!
+  category: String!
+  location: String!
+  date: DateTime!
+  reward: Float
+  imageUrl: String
+  contactVisible: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Chat {
+  id: ID!
+  postId: ID!
+  senderId: ID!
+  receiverId: ID!
+  message: String!
+  createdAt: DateTime!
+}
+
+type Reward {
+  id: ID!
+  postId: ID!
+  senderId: ID!
+  receiverId: ID!
+  amount: Float!
+  transactionId: String!
+  createdAt: DateTime!
+}

@@ -1,0 +1,43 @@
+# 1. Create a post
+mutation CreatePost($input: PostInput!) {
+  createPost(input: $input) {
+    id
+    title
+    description
+    category
+    type
+    location
+    imageUrl
+    createdAt
+  }
+}
+
+# 2. Get all posts
+query GetAllPosts {
+  listPosts {
+    id
+    title
+    type
+    category
+    location
+    createdAt
+  }
+}
+
+# 3. Get single post
+query GetPostById($id: ID!) {
+  getPost(id: $id) {
+    id
+    title
+    description
+    type
+    location
+    reward
+    imageUrl
+  }
+}
+
+# 4. Delete a post
+mutation DeletePost($id: ID!) {
+  deletePost(id: $id)
+}
