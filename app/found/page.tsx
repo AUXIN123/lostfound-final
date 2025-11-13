@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { motion } from "framer-motion";
+import MessageOwnerButton from "./components/MessageOwnerButton";
 
 interface FoundItem {
   id: number;
@@ -11,6 +12,7 @@ interface FoundItem {
   description: string;
   location: string;
   image: string;
+  ownerId: string;
 }
 
 export default function FoundPage() {
@@ -23,6 +25,7 @@ export default function FoundPage() {
       description: "Brown leather wallet found near Dhanmondi.",
       location: "Dhaka",
       image: "/images/wallet.jpg",
+      ownerId: "user1",
     },
     {
       id: 2,
@@ -30,6 +33,7 @@ export default function FoundPage() {
       description: "iPhone 12 found in Gulshan area.",
       location: "Dhaka",
       image: "/images/phone.jpg",
+      ownerId: "user2",
     },
     {
       id: 3,
@@ -37,6 +41,7 @@ export default function FoundPage() {
       description: "Black backpack found near New Market.",
       location: "Dhaka",
       image: "/images/bag.jpg",
+      ownerId: "user3",
     },
   ];
 
@@ -120,13 +125,12 @@ export default function FoundPage() {
               <h2 className="text-xl font-semibold mb-2">{item.title}</h2>
               <p className="text-gray-200 mb-2">{item.description}</p>
               <p className="text-sm text-gray-400">📍 {item.location}</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-4 w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-indigo-500 hover:to-blue-600 transition"
-              >
-                Claim Item
-              </motion.button>
+
+              {/* ✅ Message owner button (replaces Claim Item) */}
+              <MessageOwnerButton
+                ownerId={item.ownerId}
+                itemId={item.id.toString()}
+              />
             </div>
           </motion.div>
         ))}

@@ -1,6 +1,5 @@
 "use client";
 
-
 import MessageOwnerButton from "./MessageOwnerButton";
 
 export default function FoundItemsList({ items }: { items: any[] }) {
@@ -27,7 +26,7 @@ export default function FoundItemsList({ items }: { items: any[] }) {
           </div>
 
           {/* 💬 Message Owner Button */}
-          <MessageOwnerButton ownerId={item.userId} />
+          <MessageOwnerButton ownerId={item.userId} itemId={item.id} />
         </div>
       ))}
     </div>

@@ -1,30 +1,24 @@
 "use client";
+
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/auth/context/AuthContext";
-import { getOrCreateChat } from "../../lib/firestoreChat";
 
-export default function MessageOwnerButton({ ownerId }: { ownerId: string }) {
+type MessageOwnerButtonProps = {
+  ownerId: string;
+  itemId: string;
+};
+
+export default function MessageOwnerButton({ ownerId, itemId }: MessageOwnerButtonProps) {
   const router = useRouter();
-  const { user } = useAuth();
 
-  const handleChat = async () => {
-    if (!user) {
-      alert("Please sign in to send a message.");
-      return;
-    }
-    if (user.uid === ownerId) {
-      alert("You cannot message yourself!");
-      return;
-    }
-
-    const chatId = await getOrCreateChat(user.uid, ownerId);
-    router.push(`/chat/${chatId}`);
+  const handleMessageClick = () => {
+    // Navigate to a chat or message page (you can adjust this path as needed)
+    router.push(`/messages/${ownerId}?item=${itemId}`);
   };
 
   return (
     <button
-      onClick={handleChat}
-      className="px-4 py-2 mt-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold hover:opacity-90 transition"
+      onClick={handleMessageClick}
+      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
     >
       💬 Message Owner
     </button>
