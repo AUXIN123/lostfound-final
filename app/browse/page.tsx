@@ -5,9 +5,11 @@ import {
   getFirestore,
   collection,
   getDocs,
+  addDoc,
   query,
   orderBy,
   where,
+  serverTimestamp,
 } from "firebase/firestore";
 import Image from "next/image";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
@@ -31,6 +33,7 @@ interface Item {
   image?: string;
   category?: string;
   uploaderName?: string;
+  contactInfo?: string;
   createdAt?: any;
   location?: { lat: number; lng: number };
 }
@@ -42,6 +45,11 @@ export default function BrowsePage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("Newest");
+  const [messageBoxOpen, setMessageBoxOpen] = useState<string | null>(null);
+  const [senderName, setSenderName] = useState("");
+  const [senderEmail, setSenderEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
 
   // 🔹 Define categories with icons
   const categories = [
@@ -57,9 +65,8 @@ export default function BrowsePage() {
     { name: "Other", icon: <FaBoxOpen className="text-gray-300" /> },
   ];
 
-  // 🌀 Animated gradient background control
+  // 🌀 Animated background
   const bgControls = useAnimation();
-
   useEffect(() => {
     const loop = async () => {
       while (true) {
@@ -140,12 +147,42 @@ export default function BrowsePage() {
     setFilteredItems(filtered);
   }, [searchQuery, sortOrder, items]);
 
+  // 💬 Send message
+  const handleSendMessage = async (itemId: string) => {
+    if (!senderName || !senderEmail || !message) {
+      alert("Please fill in all fields before sending your message.");
+      return;
+    }
+
+    try {
+      setSending(true);
+      const db = getFirestore();
+      await addDoc(collection(db, "messages"), {
+        itemId,
+        senderName,
+        senderEmail,
+        message,
+        sentAt: serverTimestamp(),
+      });
+      alert("Message sent successfully!");
+      setMessage("");
+      setSenderName("");
+      setSenderEmail("");
+      setMessageBoxOpen(null);
+    } catch (err) {
+      console.error("❌ Error sending message:", err);
+      alert("Failed to send message. Try again.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <motion.main
       className="relative min-h-screen text-white p-8 overflow-hidden"
       animate={bgControls}
     >
-      {/* 🌌 Floating animated particles */}
+      {/* 🌌 Floating particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(15)].map((_, i) => (
           <motion.div
@@ -171,7 +208,6 @@ export default function BrowsePage() {
         ))}
       </div>
 
-      {/* 🔹 Title */}
       <motion.h1
         className="text-4xl font-bold text-center mb-8 drop-shadow-lg"
         initial={{ opacity: 0, y: -40 }}
@@ -181,13 +217,8 @@ export default function BrowsePage() {
         ✨ Browse Lost & Found Items
       </motion.h1>
 
-      {/* 🔍 Filters */}
-      <motion.div
-        className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10 relative z-10"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10 relative z-10">
         <input
           type="text"
           placeholder="🔎 Search items..."
@@ -205,120 +236,129 @@ export default function BrowsePage() {
           <option>A-Z</option>
           <option>Z-A</option>
         </select>
-      </motion.div>
+      </div>
 
-      {/* 🏷️ Animated Categories */}
-      <motion.div
-        className="flex flex-wrap justify-center gap-4 mb-10 relative z-10"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
+      {/* Categories */}
+      <div className="flex flex-wrap justify-center gap-4 mb-10 relative z-10">
         {categories.map((cat) => (
           <motion.button
             key={cat.name}
             onClick={() => setSelectedCategory(cat.name)}
-            whileHover={{ scale: 1.1, rotate: [0, 5, -5, 0] }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.1 }}
             className={`flex items-center gap-2 px-5 py-2 rounded-full font-medium transition-all ${
               selectedCategory === cat.name
                 ? "bg-cyan-500 text-white scale-105 shadow-lg"
                 : "bg-white/10 text-gray-300 hover:bg-cyan-400/30"
             }`}
           >
-            <motion.span
-              animate={{ rotate: selectedCategory === cat.name ? 360 : 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              {cat.icon}
-            </motion.span>
-            {cat.name}
+            {cat.icon} {cat.name}
           </motion.button>
         ))}
-      </motion.div>
+      </div>
 
-      {/* Items Grid */}
+      {/* Items */}
       {loading ? (
         <div className="flex flex-wrap justify-center gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="w-72 h-80 bg-white/10 rounded-2xl animate-pulse"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            />
+            <div key={i} className="w-72 h-80 bg-white/10 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <motion.p
-          className="text-center text-gray-300 text-lg relative z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          No items found.
-        </motion.p>
+        <p className="text-center text-gray-300 text-lg">No items found.</p>
       ) : (
-        <motion.div
-          layout
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto relative z-10"
-        >
-          <AnimatePresence>
-            {filteredItems.map((item) => (
-              <motion.div
-                key={item.id}
-                layout
-                className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg overflow-hidden hover:scale-[1.03] transition-transform cursor-pointer"
-                whileHover={{ y: -5 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div className="relative w-full h-48 bg-gray-800">
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.itemName || "Lost item"}
-                      fill
-                      className="object-cover"
-                      unoptimized
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto relative z-10">
+          {filteredItems.map((item) => (
+            <motion.div
+              key={item.id}
+              className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg overflow-hidden hover:scale-[1.03] transition-transform cursor-pointer"
+              whileHover={{ y: -5 }}
+            >
+              <div className="relative w-full h-48 bg-gray-800">
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.itemName || "Lost item"}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-500">
+                    No Image
+                  </div>
+                )}
+              </div>
+              <div className="p-4 space-y-2">
+                <h2 className="text-lg font-semibold">{item.itemName}</h2>
+                {item.category && (
+                  <span className="inline-block text-xs bg-cyan-500/30 text-cyan-300 px-2 py-1 rounded-full">
+                    {item.category}
+                  </span>
+                )}
+                <p className="text-gray-300 text-sm line-clamp-2">{item.description}</p>
+                {item.location && (
+                  <p className="text-xs text-green-400">
+                    📍 {item.location.lat.toFixed(3)}, {item.location.lng.toFixed(3)}
+                  </p>
+                )}
+                <p className="text-xs text-gray-400">
+                  {item.createdAt?.toDate
+                    ? item.createdAt.toDate().toLocaleString()
+                    : "Unknown date"}
+                </p>
+                {item.uploaderName && (
+                  <p className="text-xs text-cyan-400">👤 {item.uploaderName}</p>
+                )}
+                {item.contactInfo && (
+                  <p className="text-xs text-yellow-400">📞 {item.contactInfo}</p>
+                )}
+
+                {/* 💬 Message box */}
+                <button
+                  onClick={() =>
+                    setMessageBoxOpen(messageBoxOpen === item.id ? null : item.id)
+                  }
+                  className="w-full mt-2 bg-cyan-500/30 hover:bg-cyan-500/50 rounded-lg py-1 text-sm transition"
+                >
+                  💬 {messageBoxOpen === item.id ? "Cancel" : "Send Message"}
+                </button>
+
+                {messageBoxOpen === item.id && (
+                  <div className="mt-3 space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Your name"
+                      value={senderName}
+                      onChange={(e) => setSenderName(e.target.value)}
+                      className="w-full px-2 py-1 rounded bg-white/10 text-white text-sm"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-500">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <div className="p-4 space-y-2">
-                  <h2 className="text-lg font-semibold">{item.itemName}</h2>
-                  {item.category && (
-                    <span className="inline-block text-xs bg-cyan-500/30 text-cyan-300 px-2 py-1 rounded-full">
-                      {item.category}
-                    </span>
-                  )}
-                  <p className="text-gray-300 text-sm line-clamp-2">
-                    {item.description}
-                  </p>
-                  {item.location && (
-                    <p className="text-xs text-green-400">
-                      📍 {item.location.lat.toFixed(3)}, {item.location.lng.toFixed(3)}
-                    </p>
-                  )}
-                  <p className="text-xs text-gray-400">
-                    {item.createdAt?.toDate
-                      ? item.createdAt.toDate().toLocaleString()
-                      : "Unknown date"}
-                  </p>
-                  {item.uploaderName && (
-                    <p className="text-xs text-cyan-400">
-                      👤 {item.uploaderName}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+                    <input
+                      type="email"
+                      placeholder="Your email"
+                      value={senderEmail}
+                      onChange={(e) => setSenderEmail(e.target.value)}
+                      className="w-full px-2 py-1 rounded bg-white/10 text-white text-sm"
+                    />
+                    <textarea
+                      placeholder="Write your message..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      rows={3}
+                      className="w-full px-2 py-1 rounded bg-white/10 text-white text-sm"
+                    />
+                    <button
+                      onClick={() => handleSendMessage(item.id)}
+                      disabled={sending}
+                      className="w-full bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-1 text-sm transition"
+                    >
+                      {sending ? "Sending..." : "Send"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
       )}
     </motion.main>
   );

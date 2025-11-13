@@ -15,12 +15,12 @@ export default function AddItemPage() {
   const [itemName, setItemName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const [contact, setContact] = useState(user?.email || ""); // ✅ Contact info
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-  // 🧩 Available categories
   const categories = [
     "Electronics",
     "Documents",
@@ -33,12 +33,10 @@ export default function AddItemPage() {
     "Other",
   ];
 
-  // 🔹 Load NSFW model once
   useEffect(() => {
     loadModel();
   }, []);
 
-  // 🌍 Get user GPS
   const getUserLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
@@ -57,11 +55,15 @@ export default function AddItemPage() {
     );
   };
 
-  // 📤 Submit form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       alert("Please sign in to add a lost item.");
+      return;
+    }
+
+    if (!contact.trim()) {
+      alert("Please provide your contact information (email or phone).");
       return;
     }
 
@@ -87,11 +89,11 @@ export default function AddItemPage() {
         imageUrl = await getDownloadURL(storageRef);
       }
 
-      // ✅ Save to Firestore
       await addDoc(collection(db, "items"), {
         itemName,
         description,
         category,
+        contact, // ✅ Save contact info
         image: imageUrl,
         userId: user.uid,
         uploaderName: user.displayName || user.email || "Anonymous",
@@ -112,7 +114,6 @@ export default function AddItemPage() {
 
   return (
     <main className="relative flex flex-col items-center p-8 text-white min-h-screen overflow-hidden">
-      {/* ✨ Animated background */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-gray-900 opacity-70"
         animate={{
@@ -134,7 +135,6 @@ export default function AddItemPage() {
         📝 Report Lost Item
       </motion.h1>
 
-      {/* 🧾 Animated Form */}
       <motion.form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 w-full max-w-md bg-white/10 p-8 rounded-2xl backdrop-blur-md shadow-xl border border-white/20 z-10"
@@ -173,6 +173,17 @@ export default function AddItemPage() {
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          className="p-3 rounded bg-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          required
+          whileFocus={{ scale: 1.02 }}
+        />
+
+        {/* ✅ Contact Field */}
+        <motion.input
+          type="text"
+          placeholder="Contact Info (Email or Phone)"
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
           className="p-3 rounded bg-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
           required
           whileFocus={{ scale: 1.02 }}
