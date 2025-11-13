@@ -1,26 +1,31 @@
-// lib/firebase.ts
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
+// 🔥 EXTENSIVE DEBUGGING
+console.log("=== FIREBASE ENV DEBUG ===");
+console.log("API_KEY:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? "✅ LOADED" : "❌ MISSING");
+console.log("AUTH_DOMAIN:", process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? "✅ LOADED" : "❌ MISSING");
+console.log("PROJECT_ID:", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? "✅ LOADED" : "❌ MISSING");
+console.log("All env keys:", Object.keys(process.env).filter(key => key.includes('FIREBASE')));
+console.log("=== END DEBUG ===");
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBpRh_sYQhvvZLXTuKhShOv5GF5h8XSc7s",
-  authDomain: "lostandfound-b454a.firebaseapp.com",
-  projectId: "lostandfound-b454a",
-  storageBucket: "lostandfound-b454a.appspot.com", // ✅ FIXED DOMAIN
-  messagingSenderId: "300563641985",
-  appId: "1:300563641985:web:bcd9a5459f3dcde7c23f80",
-  measurementId: "G-RTGTCB4F77",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// ✅ Initialize Firebase app only once
-const app = initializeApp(firebaseConfig);
+// ✅ Prevent duplicate app initialization
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// ✅ Export initialized services
-export const db = getFirestore(app);
+// ✅ Export Firebase services
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// ✅ Default export (optional)
 export default app;
