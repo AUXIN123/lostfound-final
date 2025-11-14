@@ -1,3 +1,14 @@
+/* ===========================
+   GLOBAL FONT OVERRIDE → INTER
+   =========================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Make Inter default everywhere */
+* {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Tailwind Reset (must come AFTER your font!) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,8 +26,7 @@ button {
   font-weight: 600;
 }
 
-
-
+/* Tailwind vars */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -45,6 +55,7 @@ button {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
@@ -73,8 +84,6 @@ button {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -83,6 +92,8 @@ button {
     @apply bg-background text-foreground;
   }
 }
+
+/* Shake animation */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-6px); }

@@ -1,362 +1,165 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  addDoc,
-  query,
-  orderBy,
-  where,
-  serverTimestamp,
-} from "firebase/firestore";
-import Image from "next/image";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
-import {
-  FaLaptop,
-  FaFileAlt,
-  FaTshirt,
-  FaKey,
-  FaGem,
-  FaWallet,
-  FaDog,
-  FaShoppingBag,
-  FaBoxOpen,
-} from "react-icons/fa";
-import { IoMdInfinite } from "react-icons/io";
+import { useEffect, useState, useMemo } from "react";
+import { motion, useAnimation } from "framer-motion";
+import Link from "next/link";
+import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-interface Item {
-  id: string;
-  itemName: string;
-  description: string;
-  image?: string;
-  category?: string;
-  uploaderName?: string;
-  contactInfo?: string;
-  createdAt?: any;
-  location?: { lat: number; lng: number };
-}
+// Icons
+import { MdDevices } from "react-icons/md";        // Electronics
+import { FaRegFileAlt, FaKey, FaWallet, FaDog } from "react-icons/fa"; 
+import { GiClothes, GiJewelCrown } from "react-icons/gi"; 
+import { BsBagFill } from "react-icons/bs";
+import { FaBoxOpen } from "react-icons/fa";
+
+import VoiceSearch from "./components/VoiceSearch";
 
 export default function BrowsePage() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("Newest");
-  const [messageBoxOpen, setMessageBoxOpen] = useState<string | null>(null);
-  const [senderName, setSenderName] = useState("");
-  const [senderEmail, setSenderEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-  // 🔹 Define categories with icons
-  const categories = [
-    { name: "All", icon: <IoMdInfinite className="text-white" /> },
-    { name: "Electronics", icon: <FaLaptop className="text-cyan-400" /> },
-    { name: "Documents", icon: <FaFileAlt className="text-yellow-300" /> },
-    { name: "Clothing", icon: <FaTshirt className="text-pink-400" /> },
-    { name: "Bags", icon: <FaShoppingBag className="text-blue-400" /> },
-    { name: "Jewelry", icon: <FaGem className="text-purple-400" /> },
-    { name: "Keys", icon: <FaKey className="text-orange-400" /> },
-    { name: "Wallets", icon: <FaWallet className="text-green-400" /> },
-    { name: "Pets", icon: <FaDog className="text-amber-400" /> },
-    { name: "Other", icon: <FaBoxOpen className="text-gray-300" /> },
-  ];
-
-  // 🌀 Animated background
   const bgControls = useAnimation();
+
+  // Background animation
   useEffect(() => {
-    const loop = async () => {
+    const animate = async () => {
       while (true) {
         await bgControls.start({
           background: [
-            "radial-gradient(circle at 10% 20%, #0f0c29, #302b63, #24243e)",
-            "radial-gradient(circle at 90% 80%, #1a2a6c, #b21f1f, #fdbb2d)",
-            "radial-gradient(circle at 20% 70%, #16222a, #3a6073)",
-            "radial-gradient(circle at 70% 30%, #000428, #004e92)",
+            "radial-gradient(circle at 10% 20%, #0fe0c9, #0c3b68)",
+            "radial-gradient(circle at 90% 80%, #1a2a6c, #ff5f6d)",
+            "radial-gradient(circle at 50% 50%, #2b5876, #4e4376)",
           ],
-          transition: { duration: 15, repeat: Infinity, repeatType: "mirror" },
+          transition: { duration: 6, repeat: Infinity, repeatType: "reverse" },
         });
       }
     };
-    loop();
+    animate();
   }, [bgControls]);
 
-  // 🧠 Fetch items
+  // Voice Search handler
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+  };
+
+  // Fetch items from Firestore
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+
       try {
-        const db = getFirestore();
-        let q;
-        if (selectedCategory === "All") {
-          q = query(collection(db, "items"), orderBy("createdAt", "desc"));
-        } else {
-          q = query(
-            collection(db, "items"),
-            where("category", "==", selectedCategory),
-            orderBy("createdAt", "desc")
-          );
-        }
+        const ref = collection(db, "items");
+        let q =
+          selectedCategory === "All"
+            ? query(ref, orderBy("createdAt", "desc"))
+            : query(
+                ref,
+                where("category", "==", selectedCategory),
+                orderBy("createdAt", "desc")
+              );
 
-        const snapshot = await getDocs(q);
-        const data: Item[] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Item[];
+        const snap = await getDocs(q);
 
-        setItems(data);
-        setFilteredItems(data);
-      } catch (error) {
-        console.error("❌ Error fetching items:", error);
-      } finally {
-        setLoading(false);
+        setItems(
+          snap.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+          }))
+        );
+      } catch (err) {
+        console.error(err);
       }
+
+      setLoading(false);
     };
 
-    fetchItems();
+    fetchData();
   }, [selectedCategory]);
 
-  // 🔍 Search + Sort
-  useEffect(() => {
-    let filtered = items.filter(
-      (item) =>
-        item.itemName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  // Search filtering
+  const filteredItems = useMemo(() => {
+    if (!searchText.trim()) return items;
+    return items.filter((item) =>
+      item.title.toLowerCase().includes(searchText.toLowerCase())
     );
+  }, [items, searchText]);
 
-    if (sortOrder === "A-Z") {
-      filtered = filtered.sort((a, b) =>
-        (a.itemName || "").localeCompare(b.itemName || "")
-      );
-    } else if (sortOrder === "Z-A") {
-      filtered = filtered.sort((a, b) =>
-        (b.itemName || "").localeCompare(a.itemName || "")
-      );
-    } else if (sortOrder === "Oldest") {
-      filtered = filtered.sort(
-        (a, b) => a.createdAt?.seconds - b.createdAt?.seconds
-      );
-    } else {
-      filtered = filtered.sort(
-        (a, b) => b.createdAt?.seconds - a.createdAt?.seconds
-      );
-    }
-
-    setFilteredItems(filtered);
-  }, [searchQuery, sortOrder, items]);
-
-  // 💬 Send message
-  const handleSendMessage = async (itemId: string) => {
-    if (!senderName || !senderEmail || !message) {
-      alert("Please fill in all fields before sending your message.");
-      return;
-    }
-
-    try {
-      setSending(true);
-      const db = getFirestore();
-      await addDoc(collection(db, "messages"), {
-        itemId,
-        senderName,
-        senderEmail,
-        message,
-        sentAt: serverTimestamp(),
-      });
-      alert("Message sent successfully!");
-      setMessage("");
-      setSenderName("");
-      setSenderEmail("");
-      setMessageBoxOpen(null);
-    } catch (err) {
-      console.error("❌ Error sending message:", err);
-      alert("Failed to send message. Try again.");
-    } finally {
-      setSending(false);
-    }
-  };
+  // Category List (Option B Icons)
+  const categories = [
+    { name: "All", icon: <FaBoxOpen /> },
+    { name: "Electronics", icon: <MdDevices /> },
+    { name: "Documents", icon: <FaRegFileAlt /> },
+    { name: "Clothing", icon: <GiClothes /> },
+    { name: "Bags", icon: <BsBagFill /> },
+    { name: "Jewelry", icon: <GiJewelCrown /> },
+    { name: "Keys", icon: <FaKey /> },
+    { name: "Wallets", icon: <FaWallet /> },
+    { name: "Pets", icon: <FaDog /> },
+    { name: "Other", icon: <FaBoxOpen /> },
+  ];
 
   return (
     <motion.main
-      className="relative min-h-screen text-white p-8 overflow-hidden"
       animate={bgControls}
+      className="min-h-screen p-6 text-white transition-all"
     >
-      {/* 🌌 Floating particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-3 h-3 bg-cyan-400/40 rounded-full blur-sm"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              opacity: 0.2 + Math.random() * 0.6,
-              scale: 0.8 + Math.random() * 1.5,
-            }}
-            animate={{
-              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
-              opacity: [0.2, 0.8, 0.2],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 15,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+      <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-cyan-300 via-pink-400 to-yellow-300 text-transparent bg-clip-text">
+        ✨ Lost & Found
+      </h1>
+
+      {/* Voice Search */}
+      <div className="max-w-xl mx-auto mb-6">
+        <VoiceSearch onSearch={handleSearch} />
       </div>
 
-      <motion.h1
-        className="text-4xl font-bold text-center mb-8 drop-shadow-lg"
-        initial={{ opacity: 0, y: -40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        ✨ Browse Lost & Found Items
-      </motion.h1>
+      {/* Category Filter */}
+      <div className="flex gap-3 overflow-x-auto py-2 mb-6 scrollbar-hide">
+        {categories.map((cat) => {
+          const isSelected = selectedCategory === cat.name;
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10 relative z-10">
-        <input
-          type="text"
-          placeholder="🔎 Search items..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:w-80 px-4 py-2 rounded-full bg-white/10 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-cyan-400"
-        />
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          className="px-4 py-2 rounded-full bg-white/10 text-white outline-none focus:ring-2 focus:ring-cyan-400"
-        >
-          <option>Newest</option>
-          <option>Oldest</option>
-          <option>A-Z</option>
-          <option>Z-A</option>
-        </select>
-      </div>
-
-      {/* Categories */}
-      <div className="flex flex-wrap justify-center gap-4 mb-10 relative z-10">
-        {categories.map((cat) => (
-          <motion.button
-            key={cat.name}
-            onClick={() => setSelectedCategory(cat.name)}
-            whileHover={{ scale: 1.1 }}
-            className={`flex items-center gap-2 px-5 py-2 rounded-full font-medium transition-all ${
-              selectedCategory === cat.name
-                ? "bg-cyan-500 text-white scale-105 shadow-lg"
-                : "bg-white/10 text-gray-300 hover:bg-cyan-400/30"
-            }`}
-          >
-            {cat.icon} {cat.name}
-          </motion.button>
-        ))}
-      </div>
-
-      {/* Items */}
-      {loading ? (
-        <div className="flex flex-wrap justify-center gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="w-72 h-80 bg-white/10 rounded-2xl animate-pulse" />
-          ))}
-        </div>
-      ) : filteredItems.length === 0 ? (
-        <p className="text-center text-gray-300 text-lg">No items found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto relative z-10">
-          {filteredItems.map((item) => (
-            <motion.div
-              key={item.id}
-              className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg overflow-hidden hover:scale-[1.03] transition-transform cursor-pointer"
-              whileHover={{ y: -5 }}
+          return (
+            <button
+              key={cat.name}
+              aria-pressed={isSelected}
+              onClick={() => setSelectedCategory(cat.name)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition whitespace-nowrap ${
+                isSelected
+                  ? "bg-white/20 border-white"
+                  : "border-white/20 hover:bg-white/10"
+              }`}
             >
-              <div className="relative w-full h-48 bg-gray-800">
-                {item.image ? (
-                  <Image
-                    src={item.image}
-                    alt={item.itemName || "Lost item"}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-500">
-                    No Image
-                  </div>
-                )}
-              </div>
-              <div className="p-4 space-y-2">
-                <h2 className="text-lg font-semibold">{item.itemName}</h2>
-                {item.category && (
-                  <span className="inline-block text-xs bg-cyan-500/30 text-cyan-300 px-2 py-1 rounded-full">
-                    {item.category}
-                  </span>
-                )}
-                <p className="text-gray-300 text-sm line-clamp-2">{item.description}</p>
-                {item.location && (
-                  <p className="text-xs text-green-400">
-                    📍 {item.location.lat.toFixed(3)}, {item.location.lng.toFixed(3)}
-                  </p>
-                )}
-                <p className="text-xs text-gray-400">
-                  {item.createdAt?.toDate
-                    ? item.createdAt.toDate().toLocaleString()
-                    : "Unknown date"}
-                </p>
-                {item.uploaderName && (
-                  <p className="text-xs text-cyan-400">👤 {item.uploaderName}</p>
-                )}
-                {item.contactInfo && (
-                  <p className="text-xs text-yellow-400">📞 {item.contactInfo}</p>
-                )}
+              <span className="text-xl">{cat.icon}</span>
+              {cat.name}
+            </button>
+          );
+        })}
+      </div>
 
-                {/* 💬 Message box */}
-                <button
-                  onClick={() =>
-                    setMessageBoxOpen(messageBoxOpen === item.id ? null : item.id)
-                  }
-                  className="w-full mt-2 bg-cyan-500/30 hover:bg-cyan-500/50 rounded-lg py-1 text-sm transition"
-                >
-                  💬 {messageBoxOpen === item.id ? "Cancel" : "Send Message"}
-                </button>
-
-                {messageBoxOpen === item.id && (
-                  <div className="mt-3 space-y-2">
-                    <input
-                      type="text"
-                      placeholder="Your name"
-                      value={senderName}
-                      onChange={(e) => setSenderName(e.target.value)}
-                      className="w-full px-2 py-1 rounded bg-white/10 text-white text-sm"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Your email"
-                      value={senderEmail}
-                      onChange={(e) => setSenderEmail(e.target.value)}
-                      className="w-full px-2 py-1 rounded bg-white/10 text-white text-sm"
-                    />
-                    <textarea
-                      placeholder="Write your message..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      rows={3}
-                      className="w-full px-2 py-1 rounded bg-white/10 text-white text-sm"
-                    />
-                    <button
-                      onClick={() => handleSendMessage(item.id)}
-                      disabled={sending}
-                      className="w-full bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg py-1 text-sm transition"
-                    >
-                      {sending ? "Sending..." : "Send"}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+      {/* Items Grid */}
+      {loading ? (
+        <p className="text-center text-gray-200">Loading items...</p>
+      ) : filteredItems.length === 0 ? (
+        <p className="text-center text-gray-300">No matching items.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {filteredItems.map((item) => (
+            <Link
+              key={item.id}
+              href={`/item/${item.id}`}
+              className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 hover:bg-white/20 transition"
+            >
+              <img
+                src={item.imageUrl}
+                alt={item.title}
+                className="w-full h-40 object-cover rounded-lg mb-3"
+              />
+              <h2 className="text-xl font-semibold">{item.title}</h2>
+              <p className="text-sm opacity-80">{item.category}</p>
+            </Link>
           ))}
         </div>
       )}
