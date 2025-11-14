@@ -1,0 +1,159 @@
+[debug] [2025-11-13T22:13:33.499Z] ----------------------------------------------------------------------
+[debug] [2025-11-13T22:13:33.501Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\hamza\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init hosting
+[debug] [2025-11-13T22:13:33.502Z] CLI Version:   14.25.0
+[debug] [2025-11-13T22:13:33.502Z] Platform:      win32
+[debug] [2025-11-13T22:13:33.502Z] Node Version:  v24.11.0
+[debug] [2025-11-13T22:13:33.502Z] Time:          Fri Nov 14 2025 04:13:33 GMT+0600 (Bangladesh Standard Time)
+[debug] [2025-11-13T22:13:33.502Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\hamza\lostfound2
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2025-11-13T22:13:38.417Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-13T22:13:38.417Z] > authorizing via signed-in user (hamzarafsan2018@gmail.com)
+[debug] [2025-11-13T22:13:38.418Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:13:38.418Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:13:38.419Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a [none]
+[debug] [2025-11-13T22:13:39.139Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a 200
+[debug] [2025-11-13T22:13:39.139Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a {"projectId":"lostandfound-b454a","projectNumber":"300563641985","displayName":"lostandfound","name":"projects/lostandfound-b454a","resources":{"hostingSite":"lostandfound-b454a","realtimeDatabaseInstance":"lostandfound-b454a-default-rtdb"},"state":"ACTIVE","etag":"1_04c5d3bf-c34c-4b73-a5e8-3b54e9f7c220"}
+[info] i  Using project lostandfound-b454a (lostandfound) . 
+[info] 
+=== Hosting Setup
+[debug] [2025-11-13T22:13:39.145Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:13:39.145Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:13:39.146Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a [none]
+[debug] [2025-11-13T22:13:39.755Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a 200
+[debug] [2025-11-13T22:13:39.755Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a {"projectId":"lostandfound-b454a","projectNumber":"300563641985","displayName":"lostandfound","name":"projects/lostandfound-b454a","resources":{"hostingSite":"lostandfound-b454a","realtimeDatabaseInstance":"lostandfound-b454a-default-rtdb"},"state":"ACTIVE","etag":"1_04c5d3bf-c34c-4b73-a5e8-3b54e9f7c220"}
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 
+[info] 
+[info] i  Detected a .git folder at C:\Users\hamza\lostfound2 
+[info] i  Authorizing with GitHub to upload your service account to a GitHub repository's secrets store. 
+[info] 
+[info] Visit this URL on this device to log in:
+[info] https://github.com/login/oauth/authorize?client_id=89cf50f02ac6aaed3484&state=880998205&redirect_uri=http%3A%2F%2Flocalhost%3A9005&scope=read%3Auser%20repo%20public_repo
+[info] 
+[info] Waiting for authentication...
+[debug] [2025-11-13T22:13:58.910Z] >>> [apiv2][query] POST https://github.com/login/oauth/access_token [none]
+[debug] [2025-11-13T22:13:58.910Z] >>> [apiv2][body] POST https://github.com/login/oauth/access_token [stream]
+[debug] [2025-11-13T22:13:59.394Z] <<< [apiv2][status] POST https://github.com/login/oauth/access_token 200
+[debug] [2025-11-13T22:13:59.394Z] <<< [apiv2][body] POST https://github.com/login/oauth/access_token {"access_token":"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","token_type":"bearer","scope":"read:user,repo"}
+[debug] [2025-11-13T22:13:59.397Z] >>> [apiv2][query] GET https://api.github.com/user [none]
+[debug] [2025-11-13T22:13:59.910Z] <<< [apiv2][status] GET https://api.github.com/user 200
+[debug] [2025-11-13T22:13:59.910Z] <<< [apiv2][body] GET https://api.github.com/user {"login":"AUXIN123","id":193480718,"node_id":"U_kgDOC4hIDg","avatar_url":"https://avatars.githubusercontent.com/u/193480718?v=4","gravatar_id":"","url":"https://api.github.com/users/AUXIN123","html_url":"https://github.com/AUXIN123","followers_url":"https://api.github.com/users/AUXIN123/followers","following_url":"https://api.github.com/users/AUXIN123/following{/other_user}","gists_url":"https://api.github.com/users/AUXIN123/gists{/gist_id}","starred_url":"https://api.github.com/users/AUXIN123/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/AUXIN123/subscriptions","organizations_url":"https://api.github.com/users/AUXIN123/orgs","repos_url":"https://api.github.com/users/AUXIN123/repos","events_url":"https://api.github.com/users/AUXIN123/events{/privacy}","received_events_url":"https://api.github.com/users/AUXIN123/received_events","type":"User","user_view_type":"private","site_admin":false,"name":"Rafsan Hamza","company":null,"blog":"","location":null,"email":"hamzarafsan2018@gmail.com","hireable":null,"bio":null,"twitter_username":null,"notification_email":"hamzarafsan2018@gmail.com","public_repos":4,"public_gists":0,"followers":0,"following":0,"created_at":"2025-01-02T09:23:23Z","updated_at":"2025-11-13T15:02:25Z","private_gists":0,"total_private_repos":2,"owned_private_repos":2,"disk_usage":2398,"collaborators":0,"two_factor_authentication":false,"plan":{"name":"free","space":976562499,"collaborators":0,"private_repos":10000}}
+[info] 
+[info] +  Success! Logged into GitHub as AUXIN123 
+[info] 
+[debug] [2025-11-13T22:15:26.978Z] >>> [apiv2][query] GET https://api.github.com/repos/skip/actions/secrets/public-key type=owner
+[debug] [2025-11-13T22:15:27.359Z] <<< [apiv2][status] GET https://api.github.com/repos/skip/actions/secrets/public-key 404
+[debug] [2025-11-13T22:15:27.359Z] <<< [apiv2][body] GET https://api.github.com/repos/skip/actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest","status":"404"}
+[info] 
+[info] 
+[error] !  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2025-11-13T22:15:48.890Z] >>> [apiv2][query] GET https://api.github.com/repos/skipskip/actions/secrets/public-key type=owner
+[debug] [2025-11-13T22:15:49.719Z] <<< [apiv2][status] GET https://api.github.com/repos/skipskip/actions/secrets/public-key 404
+[debug] [2025-11-13T22:15:49.719Z] <<< [apiv2][body] GET https://api.github.com/repos/skipskip/actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest","status":"404"}
+[info] 
+[info] 
+[error] !  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2025-11-13T22:15:49.983Z] >>> [apiv2][query] GET https://api.github.com/repos/skipskip/actions/secrets/public-key type=owner
+[debug] [2025-11-13T22:15:50.362Z] <<< [apiv2][status] GET https://api.github.com/repos/skipskip/actions/secrets/public-key 404
+[debug] [2025-11-13T22:15:50.362Z] <<< [apiv2][body] GET https://api.github.com/repos/skipskip/actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest","status":"404"}
+[info] 
+[info] 
+[error] !  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2025-11-13T22:15:53.664Z] ExitPromptError: User force closed the prompt with SIGINT
+    at Interface.sigint (C:\Users\hamza\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\@inquirer\core\dist\commonjs\lib\create-prompt.js:101:37)
+    at Interface.emit (node:events:508:28)
+    at Interface.emit (node:domain:489:12)
+    at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1317:18)
+    at ReadStream.onkeypress (node:internal/readline/interface:284:20)
+    at ReadStream.emit (node:events:520:35)
+    at ReadStream.emit (node:domain:489:12)
+    at emitKeys (node:internal/readline/utils:371:14)
+    at emitKeys.next (<anonymous>)
+    at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-11-13T22:16:23.164Z] ----------------------------------------------------------------------
+[debug] [2025-11-13T22:16:23.167Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\hamza\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init hosting
+[debug] [2025-11-13T22:16:23.167Z] CLI Version:   14.25.0
+[debug] [2025-11-13T22:16:23.167Z] Platform:      win32
+[debug] [2025-11-13T22:16:23.167Z] Node Version:  v24.11.0
+[debug] [2025-11-13T22:16:23.167Z] Time:          Fri Nov 14 2025 04:16:23 GMT+0600 (Bangladesh Standard Time)
+[debug] [2025-11-13T22:16:23.167Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\hamza\lostfound2
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2025-11-13T22:16:32.732Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-13T22:16:32.732Z] > authorizing via signed-in user (hamzarafsan2018@gmail.com)
+[debug] [2025-11-13T22:16:32.733Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:16:32.733Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:16:32.734Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a [none]
+[debug] [2025-11-13T22:16:33.422Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a 200
+[debug] [2025-11-13T22:16:33.422Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a {"projectId":"lostandfound-b454a","projectNumber":"300563641985","displayName":"lostandfound","name":"projects/lostandfound-b454a","resources":{"hostingSite":"lostandfound-b454a","realtimeDatabaseInstance":"lostandfound-b454a-default-rtdb"},"state":"ACTIVE","etag":"1_04c5d3bf-c34c-4b73-a5e8-3b54e9f7c220"}
+[info] i  Using project lostandfound-b454a (lostandfound) . 
+[info] 
+=== Hosting Setup
+[debug] [2025-11-13T22:16:33.428Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:16:33.428Z] Checked if tokens are valid: true, expires at: 1763074404049
+[debug] [2025-11-13T22:16:33.428Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a [none]
+[debug] [2025-11-13T22:16:33.996Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a 200
+[debug] [2025-11-13T22:16:33.996Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/lostandfound-b454a {"projectId":"lostandfound-b454a","projectNumber":"300563641985","displayName":"lostandfound","name":"projects/lostandfound-b454a","resources":{"hostingSite":"lostandfound-b454a","realtimeDatabaseInstance":"lostandfound-b454a-default-rtdb"},"state":"ACTIVE","etag":"1_04c5d3bf-c34c-4b73-a5e8-3b54e9f7c220"}
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 
